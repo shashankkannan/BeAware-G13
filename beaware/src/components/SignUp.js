@@ -49,7 +49,9 @@ const SignUp = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
+
+    if(formData.password ==formData.confirmPassword){
+      try {
         const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
         const user = userCredential.user;
         const usersRef = ref(database, 'users');
@@ -64,6 +66,11 @@ const SignUp = () => {
         console.error('Registration error:', error.message);
       }
         console.log('Form submitted:', formData);
+    }
+    else{
+      console.log('Password does not match, registration error:', formData);
+    }
+    
   };
 
   return (
