@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
+import { Link } from 'react-router-dom';
 import { getDatabase, ref, push, set } from 'firebase/database';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 
