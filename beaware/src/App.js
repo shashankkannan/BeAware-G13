@@ -7,7 +7,7 @@ function App() {
   return (
     <div className="App">
       <SignUp /> 
-      <SignIn />
+      {/* <SignIn /> */}
     </div>
   );
 }
