@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 
 const SignIn = () => {
   const [formData, setFormData] = useState({
@@ -11,10 +12,18 @@ const SignIn = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add your sign-in logic here
-    console.log('Sign In Form submitted:', formData);
+    const auth = getAuth();
+
+    try {
+      await signInWithEmailAndPassword(auth, formData.email, formData.password);
+      console.log('User signed in successfully');
+      console.log('Sign In Form submitted:', formData);
+      // window.location.href = "/home"; // Change to the path where Home.js is rendered
+    } catch (error) {
+      console.error('Sign-in error:', error.message);
+    }
   };
 
   return (
