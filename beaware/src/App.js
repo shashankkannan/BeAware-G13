@@ -1,13 +1,10 @@
 import React from 'react';
-import './App.css';
-import SignUp  from './components/SignUp';
-import SignIn from './components/SignIn';
+import SetupScreen from './components/SetupScreen';
 
 function App() {
   return (
-    <div className="App">
-      <SignUp /> 
-      <SignIn />
+    <div style={{ position: 'relative', height: '100vh', width: '100vw', overflow: 'hidden' }}>
+      <SetupScreen />
     </div>
   );
 }
