@@ -8,7 +8,7 @@ export const Home = () => {
 
   return (
     <div>
-      <h1>Welcome Home</h1>
+      <h1>Welcome to the BeAwareg13 Dashboard. Working on the page now!</h1>
      
     </div>
   );

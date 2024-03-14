@@ -1,15 +1,10 @@
 import React, { useState } from 'react';
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-import { Link } from 'react-router-dom';
+import '../css/SignUp.css';
+import Image from '../Assets/SignUp.png'; 
+import TxtImage from '../Assets/Vector.png';
 import { getDatabase, ref, push, set } from 'firebase/database';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
-
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyBydzDcp1Qst5mZd9j7AjwiodwTq1oBbq0",
   authDomain: "beawareg13-bdd89.firebaseapp.com",
@@ -20,164 +15,130 @@ const firebaseConfig = {
   appId: "1:634689069450:web:777dd650f473151ddb6873",
   measurementId: "G-ZBHNPLZDNC"
 };
-
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 const auth = getAuth(app);
-const SignUp = () => {
-  const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    colorCode: '',
-    streamName: '',
-    logo: null,
-  });
 
-  const handleChange = (e) => {
-    const { name, value, type } = e.target;
+export default function SignUp() {
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
-    // Handle file input separately
-    if (type === 'file') {
-      const file = e.target.files[0];
-      setFormData({ ...formData, [name]: file });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+     // Retrieve the values entered by the user
+    const userData = {
+    username: username,
+    email: email,
+    password: password,
+    confirmPassword: confirmPassword
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // Now you can use userData object to access the entered values
+  console.log(userData);
 
-    if(formData.password ==formData.confirmPassword){
-      try {
-        const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-        const user = userCredential.user;
-        const usersRef = ref(database, 'users');
-        const usersRef1 = push(usersRef)
-        await set(usersRef1, {
-        [formData.username]: formData,
-        });
-        // Here, you can handle the user registration success
-        console.log('User registered:', user);
-      } catch (error) {
-        // Handle registration errors
-        console.error('Registration error:', error.message);
-      }
-        console.log('Form submitted:', formData);
+  if(password ==confirmPassword){
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      const usersRef = ref(database, 'users');
+      const newUserRef = push(usersRef);
+      await set(newUserRef, {
+        username: username,
+        email: email,
+      });
+      // Here, you can handle the user registration success
+      console.log('User registered:', user);
+      window.location = '/signin';
+    } catch (error) {
+      // Handle registration errors
+      console.error('Registration error:', error.message);
     }
-    else{
-      console.log('Password does not match, registration error:', formData);
-    }
+      console.log('Form submitted');
+  }else{
+      console.log('Password does not match, registration error');
     
+  }
   };
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', width: '50vw', marginLeft: '20%' }}>
-      {/* Left Section: Image */}
-      <div style={{ flex: '1', marginRight: '20px' }}>
-        <img src="/bg_signup.jpg" alt='image not loaded' style={{ width: '50%', height: 'auto', borderRadius: '10px' }} />
+    <div className="sign-up-container">
+      <div className="left-side">
+        <div className="left-text">
+        <img src={TxtImage} alt="Image" className="text-image"/>
+          
+          <p className='text'>BeAware assists hearing-impaired individuals with secure sign-up and stream URL generation via user inputs, fostering accessibility goals.</p>
+        </div>
+        <img src={Image} alt="Image" className="left-image" />
       </div>
-
-      {/* Right Section: Card View */}
-      <div style={{ flex: '1', backgroundColor: '#A6E4F6', padding: '20px', borderRadius: '10px', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
-    <h1>Sign Up</h1>
-      <form onSubmit={handleSubmit} style={{marginRight: '20px'}}>
-        <label style={{ marginBottom: '10px', width: '100%' }}>
-          Username:
-          <input
-            type="text"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-            required
-            style={{ marginLeft: '10px', width: '100%' }}
-          />
-        </label>
-        <br />
-
-        <label style={{ marginBottom: '10px', width: '100%' }}>
-          Email:
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            style={{ marginLeft: '10px', width: '100%' }}
-          />
-        </label>
-        <br />
-
-        <label style={{ marginBottom: '10px', width: '100%' }}>
-          Password:
-          <input
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            style={{ marginLeft: '10px', width: '100%' }}
-          />
-        </label>
-        <br />
-
-        <label style={{ marginBottom: '10px', width: '100%' }}>
-          Confirm Password:
-          <input
-            type="password"
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            required
-            style={{ marginLeft: '10px', width: '100%' }}
-          />
-        </label>
-        <br />
-
-        <label style={{ marginBottom: '10px', width: '100%' }}>
-          Color Code:
-          <input
-            type="text"
-            name="colorCode"
-            value={formData.colorCode}
-            onChange={handleChange}
-            style={{ marginLeft: '10px', width: '100%' }}
-          />
-        </label>
-        <br />
-
-        <label style={{ marginBottom: '10px', width: '100%' }}>
-          Stream Name:
-          <input
-            type="text"
-            name="streamName"
-            value={formData.streamName}
-            onChange={handleChange}
-            style={{ marginLeft: '10px', width: '100%' }}
-          />
-        </label>
-        <br />
-
-        <label style={{ marginBottom: '10px', width: '100%' }}>
-          Logo (Image Upload):
-          <input
-            type="file"
-            name="logo"
-            accept="image/*"
-            onChange={handleChange}
-            style={{ marginLeft: '10px', width: '100%' }}
-          />
-        </label>
-        <br />
-
-        <button type="submit">Sign Up</button>
-      </form>
-    </div>
+      <div className="right-side">
+        <div className='right-side-content'>
+        <h1 className="sign-up-title">Create an account</h1>
+        <form onSubmit={handleSubmit} className="sign-up-form">
+          <div className="form-field">
+            <label htmlFor="username" className="form-label">
+            </label>
+            <input
+              type="text"
+              id="username"
+              value={username}
+              placeholder='Username'
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              className="form-input"
+            />
+          </div>
+          <div className="form-field">
+            <label htmlFor="email" className="form-label">
+              
+            </label>
+            <input
+              type="email"
+              id="email"
+              value={email}
+              placeholder='Email Address'
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="form-input"
+            />
+          </div>
+          <div className="form-field">
+            <label htmlFor="password" className="form-label">
+            </label>
+            <input
+              type="password"
+              id="password"
+              value={password}
+              placeholder='Password'
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="form-input"
+            />
+          </div>
+          <div className="form-field">
+            <label htmlFor="confirmPassword" className="form-label"> 
+            </label>
+            <input
+              type="password"
+              id="confirmPassword"
+              value={confirmPassword}
+              placeholder=' Confirm Password'
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              className="form-input"
+            />
+          </div>
+          <button type="submit" className="sign-up-button">
+          Create Account
+          </button>
+        </form>
+      </div>
+      </div>
     </div>
   );
-};
-
-export default SignUp;
+}

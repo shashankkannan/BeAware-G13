@@ -1,0 +1,131 @@
+/* Login.module.css */
+.container {
+    display: flex;
+    align-items: right;
+    height: 100vh;
+    border-top-left-radius: 100px;
+    border-bottom-left-radius: 100px;
+
+    
+  }
+  
+  .leftPanel {
+    flex: 1; /* Take up the entire left side */
+    height: 100%;
+    background-color: #457B9D; /* Background color for the left panel */
+    background-image: url('../Assets/Group.png');
+    background-repeat: no-repeat;
+    background-position: center bottom; /* Position the background image at the bottom */
+    background-size: contain;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Align content to the top */
+    align-items: right;
+    
+    
+  }
+  
+  .logo {
+    position:absolute;
+    margin-left: 320px;
+    margin-top: 25px;
+  }
+  
+  .text {
+    margin-top: 150px;
+    color: white;
+    font-size: 20px;
+    text-align: center;
+  }
+  
+  .formWrapper {
+    
+    padding: 20px;
+    border-top-left-radius: 100px;
+    border-bottom-left-radius: 100px;
+    border-left: 200px;
+    text-align: center;
+    display: flex; /* Add flex display */
+    flex-direction: column; /* Arrange items vertically */
+    justify-content: center; /* Center items vertically */
+    align-items: center; 
+  }
+  
+  .title {
+    font-size: 3rem;
+    margin-bottom: 50px;
+    color: #1D3557;
+  }
+  
+  .form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 300px;
+  }
+  
+  .label {
+    font-size: 1.2rem;
+    margin-top: 20px;
+    margin-bottom: 5px;
+    text-align: left;
+    display: block;
+  }
+  
+  .input {
+    width: 100%;
+    padding: 20px 50px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 10px; /* Adjust border radius */
+    margin-bottom: 20px;
+    text-align: left;
+
+  }
+  
+  .button {
+    width: 100%;
+    padding: 20px 38px ;
+    font-size: 1rem;
+    background-color: #457B9D;
+    color: white;
+    border: none;
+    border-radius: 10px; /* Adjust border radius */
+    cursor: pointer;
+    margin-bottom: 20px;
+  }
+  
+  .remember {
+    display: flex;
+    align-items: center;
+    font-size: 0.8rem;
+    margin-bottom: 20px;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  
+  }
+  
+  .remember input {
+    margin-right: 10px;
+  }
+  
+  .signup {
+    font-size: 0.8rem;
+    margin-top: 20px;
+    text-align: center;
+  }
+  
+  .signup a {
+    color: #457B9D;
+    text-decoration: none;
+  }
+  
+  .rightPanel {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: right;
+    padding: 20px;
+    border-radius: 50%;
+    border-top-right-radius: 100px;
+    border-bottom-right-radius: 100px;
+  }
