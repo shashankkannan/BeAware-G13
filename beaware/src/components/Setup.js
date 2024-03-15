@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {getDatabase, ref, push, set, orderByChild, onChildAdded,equalTo, child, query, get } from 'firebase/database';
 import { initializeApp } from "firebase/app";
-import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import '../css/SignUp.css';
 import Image from '../Assets/SignUp.png'; 
 import TxtImage from '../Assets/Vector.png';
@@ -33,6 +33,8 @@ export default function Setup() {
   const [colorhex, setcolorhex] = useState('');
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
+  const [streamNames, setStreamNames] = useState([]);
+  const [selectedStream, setSelectedStream] = useState('');
 //   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedImageName, setSelectedImageName] = useState('');
   const [toastMessage, setToastMessage] = useState('');
@@ -50,6 +52,7 @@ export default function Setup() {
     if (storedUsername && storedEmail) {
       setUsername(storedUsername);
       setEmail(storedEmail);
+      loadStreamNames(storedEmail);
     } else {
       showToast('User not signed in. Redirecting to sign-in page...');
       setTimeout(() => {
@@ -59,12 +62,33 @@ export default function Setup() {
     }
   }, []);
 
+  const loadStreamNames = async (userEmail) => {
+    try {
+      const userRef = ref(database, 'users');
+      const userQuery = query(userRef, orderByChild('email'), equalTo(userEmail));
+      const userSnapshot = await get(userQuery);
+
+      if (userSnapshot.exists()) {
+        const userId = Object.keys(userSnapshot.val())[0];
+        const streamsRef = ref(database, `users/${userId}/streams`);
+        const streamsSnapshot = await get(streamsRef);
+
+        if (streamsSnapshot.exists()) {
+          const streams = Object.keys(streamsSnapshot.val());
+          setStreamNames(streams);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching stream names:', error);
+    }
+  };
+
   const handleImageChange = (event) => {
     const file = event.target.files[0];
   if (file) {
     setSelectedImageName(file.name);
   } else {
-    // setSelectedImageName('');
+      setSelectedImageName('');
   }
   };
 
@@ -77,15 +101,20 @@ const handlehome = (event)=> {
 }
 const handleSubmit = async (event) => {
   event.preventDefault();
-  if (!streamname || !colorhex || !selectedImageName) {
-    if(!selectedImageName){
-      showToast('Please choose a logo image');
+  if (!streamname) {
+      showToast('Please enter a streamname');
+      return;}
+    if(!colorhex){
+      showToast('Please choose a color code');
       return;
     }
+    if(!selectedImageName){
+      if(!selectedStream){
+        showToast('Please choose a logo image');
+        return;
+      }
+    }
 
-    showToast('Please fill in all required fields');
-    return;
-  }
   if (!/^#[0-9A-F]{6}$/i.test(colorhex)) {
     showToast('Please enter a valid hexadecimal color code');
     return;
@@ -123,7 +152,73 @@ const handleSubmit = async (event) => {
 
     if (streamSnapshot.exists()) {
       console.log('Stream name already exists');
-      showToast('Stream name already exists');
+      showToast('Stream name already exists, if you want to edit it please use the dropdown below to select it');
+      if (selectedStream) {
+        try {
+          // Retrieve the user ID
+          const userId = Object.keys(userSnapshot.val())[0]; // Assuming there's only one user per email
+          
+          // Get the stream reference
+          const streamRef = ref(database, `users/${userId}/streams/${selectedStream}`);
+          const streamSnapshot = await get(streamRef);
+          
+          if (streamSnapshot.exists()) {
+            // Get the current stream data
+            const streamData = streamSnapshot.val();
+            
+            if (colorhex) {
+              // Update stream data with new colorhex
+              const updatedStreamData = {
+                ...streamData,
+                colorhex: colorhex,
+              };
+    
+              // Update the colorhex in the database
+              await set(streamRef, updatedStreamData);
+              showToast('Stream updated successfully!');
+            }
+    
+            if (selectedImageName) {
+              try {
+                // Retrieve the current stream data
+                const streamSnapshot = await get(streamRef);
+                const streamData = streamSnapshot.val();
+        
+                // Delete the current logoURL from Firebase Storage
+                const storage = getStorage(app);
+                const storageRefToDelete = storageRef(storage, streamData.logoURL );
+                await deleteObject(storageRefToDelete);
+        
+                // Upload the selected file to Firebase Storage
+                const file = event.target.elements.imageUpload.files[0];
+                const fileName = file.name;
+                const storageRef1 = storageRef(storage, `uploads/${fileName}`);
+                await uploadBytes(storageRef1, file);
+        
+                // Retrieve the download URL of the uploaded file
+                const fileURL = await getDownloadURL(storageRef1);
+        
+                // Update stream data with new logoURL
+                const updatedStreamData = {
+                    ...streamData,
+                    logoURL: fileURL,
+                };
+        
+                // Update the logoURL in the database
+                await set(streamRef, updatedStreamData);
+                showToast('Stream updated successfully!');
+            } catch (error) {
+                console.error('Error updating stream data:', error);
+                // Handle error, show toast message, etc.
+            }
+            }
+          }
+        } catch (error) {
+          console.error('Error updating stream data:', error);
+          // Handle error, show toast message, etc.
+        }
+      
+      }
       return;
     }
 
@@ -152,6 +247,33 @@ const handleSubmit = async (event) => {
   const handleHexChange = (e) => {
     const hex = e.target.value;
     setcolorhex(hex);
+  };
+
+  const handleStreamChange = async (e) => {
+    const selectedStreamName = e.target.value;
+    setSelectedStream(selectedStreamName);
+    setstreamname(selectedStreamName); // Set stream name from dropdown
+    try {
+      const usersRef = ref(database, 'users');
+      const userQuery = query(usersRef, orderByChild('email'), equalTo(email));
+      const userSnapshot = await get(userQuery);
+      
+      if (!userSnapshot.exists()) {
+        console.log('User does not exist with this email');
+        return;
+      }
+      
+      const userId = Object.keys(userSnapshot.val())[0];
+      const streamRef = ref(database, `users/${userId}/streams/${selectedStreamName}`);
+      const streamSnapshot = await get(streamRef);
+
+      if (streamSnapshot.exists()) {
+        const streamData = streamSnapshot.val();
+        setcolorhex(streamData.colorhex); // Set color hex from database
+      }
+    } catch (error) {
+      console.error('Error fetching stream data:', error);
+    }
   };
 
   return (
@@ -189,18 +311,33 @@ const handleSubmit = async (event) => {
   </div>
 )}
 </div>
+<div className="form-field">
+  <label htmlFor="streamname1" className="form-label">
+  </label>
+  {/* Render the input field if no stream is selected */}
+  {selectedStream ? (
+    <p>{selectedStream}</p>
+  ) : (
+    <input
+      type="text"
+      id="streamname1"
+      value={streamname}
+      placeholder="Stream Name"
+      onChange={(e) => setstreamname(e.target.value)}
+      required
+      className="form-input"
+    />
+  )}
+</div>
           <div className="form-field">
-            <label htmlFor="streamname1" className="form-label">
-            </label>
-            <input
-              type="text"
-              id="streamname1"
-              value={streamname}
-              placeholder='Stream Name'
-              onChange={(e) => setstreamname(e.target.value)}
-              required
-              className="form-input"
-            />
+            {/* Select dropdown for streams */}
+            <label htmlFor="streamSelect" className="form-label">Edit Stream </label>
+            <select id="streamSelect" value={selectedStream} onChange={handleStreamChange} className="form-input">
+              <option value="">New stream</option>
+              {streamNames.map((name, index) => (
+                <option key={index} value={name}>{name}</option>
+              ))}
+            </select>
           </div>
           <div className="form-field">
             <label htmlFor="colorHex" className="form-label">

@@ -1,17 +1,55 @@
-import React, { useState } from 'react';
-
-export const ManageProfile = () => {
-  
-
-  
-
-
+import React, { useEffect, useState } from 'react';
+import '../css/Home.css';
+import TxtImage from '../Assets/Vector.png';
+import Image from '../Assets/SignUp.png'; 
+function Toast({ message }) {
   return (
-    <div>
-      <h1>Welcome to Manage</h1>
-     
+    <div style={{ position: 'fixed', bottom: '20px', left: '50%', transform: 'translateX(-50%)', backgroundColor: '#333', color: '#fff', padding: '10px 20px', borderRadius: '5px', zIndex: '9999' }}>
+      {message}
     </div>
   );
-};
+}
+
+
+export const ManageProfile = () => {
+  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
+  const [toastMessage, setToastMessage] = useState('');
+  const showToast = (message) => {
+    setToastMessage(message);
+    setTimeout(() => {
+      setToastMessage('');
+    }, 3000); // Hide the toast after 3 seconds
+  };
+
+  useEffect(() => {
+    const storedUsername = sessionStorage.getItem('username');
+    const storedEmail = sessionStorage.getItem('email');
+    if (storedUsername && storedEmail) {
+      setUsername(storedUsername);
+      setEmail(storedEmail);
+    } 
+  }, []);
+  
+  
+
+  return (
+    <div className="sign-up-container">
+      <div className="left-side">
+        <div className="left-text">
+        <img src={TxtImage} alt="Image" className="text-image"/>
+       
+          <p className='text'>Welcome to BeAware dashboard, we are working on the page right now. Sorry for the inconvenience! </p>
+        </div>
+        <img src={Image} alt="Image" className="left-image" />
+      </div>
+      <div className="right-side">
+      
+      </div>
+      
+      {toastMessage && <Toast message={toastMessage} />}
+    </div>
+);
+  }
 
 export default ManageProfile;

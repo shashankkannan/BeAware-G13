@@ -9,6 +9,8 @@ function Toast({ message }) {
     </div>
   );
 }
+
+
 export const Home = () => {
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
@@ -35,20 +37,24 @@ export const Home = () => {
     }
   }, []);
   
-
+  const handleCreateStream = () => {
+    window.location.href = '/setup';
+  };
+  
 
   return (
     <div className="sign-up-container">
       <div className="left-side">
         <div className="left-text">
         <img src={TxtImage} alt="Image" className="text-image"/>
-          
+       
           <p className='text'>Hi {username}, Welcome to BeAware dashboard, we are working on the page right now. Sorry for the inconvenience! </p>
         </div>
         <img src={Image} alt="Image" className="left-image" />
       </div>
       <div className="right-side">
-        
+      <button onClick={handleCreateStream} className="google-sign-in-button" style={{width:"100%"}}>Manage Stream +/-</button><p></p>
+      <button onClick={() => {sessionStorage.clear(); window.location.href='/signin'}} className="google-sign-in-button" style={{width:"100%"}}>Sign out</button>
       </div>
       
       {toastMessage && <Toast message={toastMessage} />}
