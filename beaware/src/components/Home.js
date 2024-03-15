@@ -50,7 +50,7 @@ export const Home = () => {
         <img src={Image} alt="Image" className="left-image" />
       </div>
       <div className="right-side">
-      <button onClick={handleCreateStream} className="google-sign-in-button" style={{width:"100%"}}>Create Stream +</button><p></p>
+      <button onClick={handleCreateStream} className="google-sign-in-button" style={{width:"100%"}}>Manage Stream +/-</button><p></p>
       <button onClick={() => {sessionStorage.clear(); window.location.href='/signin'}} className="google-sign-in-button" style={{width:"100%"}}>Sign out</button>
       </div>
       
