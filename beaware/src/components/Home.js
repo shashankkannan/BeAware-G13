@@ -9,6 +9,8 @@ function Toast({ message }) {
     </div>
   );
 }
+
+
 export const Home = () => {
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
@@ -38,6 +40,7 @@ export const Home = () => {
   const handleCreateStream = () => {
     window.location.href = '/setup';
   };
+  
 
   return (
     <div className="sign-up-container">
