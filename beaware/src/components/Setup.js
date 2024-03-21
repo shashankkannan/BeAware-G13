@@ -97,7 +97,7 @@ export default function Setup() {
   }
 
 const handlehome = (event)=> {
-  window.location.href = "/home";
+  window.location.href = "/manage";
 }
 const handleSubmit = async (event) => {
   event.preventDefault();

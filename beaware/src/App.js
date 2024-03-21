@@ -7,6 +7,7 @@ import SignUp from './components/SignUp';
 import Home from './components/Home';
 import ManageProfile from './components/ManageProfile'
 import Setup from './components/Setup';
+import Streams from './components/Streams';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/manage" element={<ManageProfile />} />
           <Route path="/setup" element={<Setup />} />
+          <Route path="/streams" element={<Streams />} />
         </Routes>
       </div>
     </Router>
