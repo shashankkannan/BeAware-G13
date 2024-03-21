@@ -85,7 +85,7 @@ const SignIn = () => {
       }else {
         sessionStorage.setItem('username', fvn);
         sessionStorage.setItem('email', email);
-        window.location.href = '/home';
+        window.location.href = '/manage';
         // window.location = '/home';
       }
     } catch (error) {
