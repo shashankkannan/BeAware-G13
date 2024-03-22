@@ -6,8 +6,23 @@ import Image from '../Assets/SignUp.png';
 import profileicon from '../Assets/profile.png';
 import streamicon from '../Assets/stream.png'; 
 import dash from '../Assets/dashboard.png'; 
-import eye from '../Assets/eye.png'; 
-
+import eye from '../Assets/eye.png';
+import { initializeApp } from "firebase/app";
+import { getAuth, reauthenticateWithCredential, updatePassword } from 'firebase/auth';
+import {getDatabase, ref, push, set, orderByChild, onChildAdded,equalTo, child, query, get, update } from 'firebase/database';
+const firebaseConfig = {
+  apiKey: "AIzaSyBydzDcp1Qst5mZd9j7AjwiodwTq1oBbq0",
+  authDomain: "beawareg13-bdd89.firebaseapp.com",
+  databaseURL: "https://beawareg13-bdd89-default-rtdb.firebaseio.com",
+  projectId: "beawareg13-bdd89",
+  storageBucket: "beawareg13-bdd89.appspot.com",
+  messagingSenderId: "634689069450",
+  appId: "1:634689069450:web:777dd650f473151ddb6873",
+  measurementId: "G-ZBHNPLZDNC"
+};
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
+const auth = getAuth(app);
 function Toast({ message }) {
   return (
     <div style={{ position: 'fixed', bottom: '20px', left: '50%', transform: 'translateX(-50%)', backgroundColor: '#333', color: '#fff', padding: '10px 20px', borderRadius: '5px', zIndex: '9999' }}>
@@ -24,6 +39,7 @@ export const ManageProfile = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [deleteText, setDeleteText] = useState('');
+  const [ps,setps] = useState('');
   const showToast = (message) => {
     setToastMessage(message);
     setTimeout(() => {
@@ -31,12 +47,17 @@ export const ManageProfile = () => {
     }, 3000); // Hide the toast after 3 seconds
   };
 
+  
   useEffect(() => {
+    
     const storedUsername = sessionStorage.getItem('username');
     const storedEmail = sessionStorage.getItem('email');
-    if (storedUsername && storedEmail) {
+    const storedps = sessionStorage.getItem('password')
+    if (storedUsername && storedEmail && storedps) {
       setUsername(storedUsername);
       setEmail(storedEmail);
+      setps(storedps);
+      console.log(ps);
     } else {
       showToast('User not signed in. Redirecting to sign-in page...');
       setTimeout(() => {
@@ -60,26 +81,67 @@ export const ManageProfile = () => {
   const handleHome= () => {
     window.location.href = '/home';
   };
-  const handleEditUsername = () => {
-    // Logic to handle editing username
-    alert('Editing username...');
+  const handleEditUsername = async () => {
+    const newUsername = prompt('Enter new username:');
+    if (newUsername) {
+      try {
+        // Find the user with the current email
+        const userQuery = query(ref(database, 'users'), orderByChild('email'), equalTo(email));
+        const snapshot = await get(userQuery);
+        
+        if (snapshot.exists()) {
+          // Get the user ID
+          const userId = Object.keys(snapshot.val())[0];
+  
+          // Update the user's username in the database
+          const updates = {};
+          updates[`users/${userId}/username`] = newUsername;
+          await update(ref(database), updates);
+  
+          // Update the username in the state
+          setUsername(newUsername);
+          showToast('Username updated successfully');
+        } else {
+          showToast('User not found');
+        }
+      } catch (error) {
+        console.error('Error updating username:', error);
+        showToast('Error updating username');
+      }
+    }
   };
 
   const handleEditEmail = () => {
     // Logic to handle editing email
-    alert('Editing email...');
-  };
+    const newEmail = prompt('Enter new email:');
+  if (newEmail) {
+    setEmail(newEmail);
+  };}
   const handleTextClick = (text) => {
     alert(`Clicked on ${text}`);
   };
 
   
-
   const handleChangePassword = () => {
-    // Logic to handle changing password
-    alert('Changing password...');
+    if (newPassword !== confirmPassword) {
+      alert("New password and confirm password don't match.");
+      return;
+    }
+
+    const user = auth.currentUser;
+    updatePassword(user, newPassword)
+      .then(() => {
+        setOldPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+        showToast('Password updated successfully');
+      })
+      .catch((error) => {
+        console.error("Failed to update password:", error);
+        showToast(`Failed to update password: ${error.message}`);
+      });
   };
-  
+
   return (
     <table style={{ width: "100%", height: "100%"}}>
   <tr>
@@ -160,7 +222,7 @@ export const ManageProfile = () => {
                <div className="input-with-icon" style={{ display: "flex", alignItems: "center" }}>
                  <input type="email" id="email" value={email} disabled />
                  <div style={{}}>
-                 <img style={{ width: "50px", height: "50px", transform: "scale(0.5)" }} src={TxtImage} alt="Edit Icon" onClick={handleEditEmail} />
+                 {/* <img style={{ width: "50px", height: "50px", transform: "scale(0.5)" }} src={TxtImage} alt="Edit Icon" onClick={handleEditEmail} /> */}
                  </div> 
                </div>
              </div>
@@ -176,7 +238,7 @@ export const ManageProfile = () => {
                 <div className="form-field">
                   <label htmlFor="oldpassword">Old Password</label>
                   <div className="input-with-icon" style={{ display: "flex", alignItems: "center" }}>
-                    <input type="password" id="oldpassword" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} />
+                    <input type="password" id="oldpassword" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} required="true" />
                     <button style={{ border: 'none', background: 'transparent' }} onClick={(e) => 
                     {
                           e.preventDefault();
@@ -201,7 +263,7 @@ export const ManageProfile = () => {
                 <div className="form-field">
                   <label htmlFor="newpassword">New Password</label>
                   <div className="input-with-icon" style={{ display: "flex", alignItems: "center" }}>
-                    <input type="password" id="newpassword" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+                    <input type="password" id="newpassword" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required="true" />
                     <button style={{ border: 'none', background: 'transparent' }} onClick={(e) => 
                     {
                           e.preventDefault();
@@ -224,7 +286,7 @@ export const ManageProfile = () => {
                 <div className="form-field">
                   <label htmlFor="confirmpassword">Confirm Password</label>
                   <div className="input-with-icon" style={{ display: "flex", alignItems: "center" }}>
-                    <input type="password" id="confirmpassword" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+                    <input type="password" id="confirmpassword" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required="true" />
                     <button style={{ border: 'none', background: 'transparent' }} onClick={(e) => 
                     {
                           e.preventDefault();
@@ -255,7 +317,7 @@ export const ManageProfile = () => {
       outline: "none",
       backgroundColor: "transparent",
       borderRadius: "20px"
-    }}  onClick={() => handleChangePassword()
+    }}  onClick={() => handleChangePassword(email,newPassword)
     
     
     
@@ -453,6 +515,7 @@ export const ManageProfile = () => {
       </div>
     </td>
   </tr>
+  {toastMessage && <Toast message={toastMessage} />}
 </table>
 //     <div className="signupc">
 //       <div className="ls">
