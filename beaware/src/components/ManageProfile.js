@@ -116,27 +116,26 @@ export const ManageProfile = () => {
 {/* Profileeeeeeeeeeeeeeeeeeeeeeeeeeeeee sectionnnnnnnnnnnnnn withhhhhhhhh theeeeeeeeeeeee avatarrrrrrrrrrrrrrrrrrrrrrrrrr */}
 
             
-            <div>
-              <table style={{ width: "100%", height: "100%" , paddingTop: "40px"}}>
-                <tr>
-                <h1></h1>
-                <td style={{ width: "30%", verticalAlign: "top", paddingLeft:"90px"}}>
-                  
-                  
-                <img src={userpic} style={{ width: "50px", height: "50px", transform: "scale(1.0)" }} alt="Edit userpic" />
-
-                </td>
-                <td style={{ width: "70%", verticalAlign: "top"}}>
-                  
-                  <tr>{username}</tr>
-                  <p></p>
-                  <tr>{email}</tr>
-                </td>
-                </tr>
-                
-              </table>
-
-            </div>
+<div style={{ marginLeft: "100px", width: "fit-content", borderRadius: "30px", boxShadow: "0px 5px 10px rgba(0, 0, 0, 0.1)" }}>
+  <table style={{ width: "100%", height: "100%", paddingTop: "40px" }}>
+    <tr>
+      <td style={{ width: "30%", verticalAlign: "top", paddingLeft: "40px", paddingBottom: "40px", paddingRight: "40px"}}>
+        <img src={userpic} style={{ width: "50px", height: "50px", transform: "scale(1.0)" }} alt="Edit userpic" />
+      </td>
+      <td style={{ width: "70%", verticalAlign: "top" , paddingRight: "40px"}}>
+        <tr>
+          <td style={{ fontWeight: "bold" }}>Name: </td>
+          <td>&nbsp;{username}</td>
+        </tr>
+        <div style={{ marginBottom: '10px'}}></div>
+        <tr>
+          <td style={{ fontWeight: "bold" }}>Email Id:</td>
+          <td>&nbsp;{email}</td>
+        </tr>
+      </td>
+    </tr>
+  </table>
+</div>
 
             <p></p>
 
@@ -310,12 +309,14 @@ export const ManageProfile = () => {
             
           </td>
 
-          <td style={{ width: "20%", height: "100%", paddingRight:"10px", verticalAlign: "top"}}>
+          <td style={{ width: "20%", height: "100%", paddingRight:"40px", verticalAlign: "top"}}>
 
             {/* Right of Right */}
             
             
             <p></p>
+            <div style={{ marginRight: "50px" }}></div>
+  <div style={{ marginRight: "30px" }}></div>
   <button 
     style={{ 
       border: "2px solid grey", 

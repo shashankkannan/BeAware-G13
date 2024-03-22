@@ -198,7 +198,7 @@ export default function SignUp() {
           </button>
           <p></p>
           <button onClick={handleGoogleSignIn} className="google-sign-in-button">Sign Up: Google</button>
-          <h5 style={{padding:'10px', paddingLeft:'180px'}}>
+          <h5 style={{padding:'10px', paddingLeft:'80px'}}>
             Don't have an account? <Link to ="/SignIn">Sign In</Link>
           </h5>
         </form>

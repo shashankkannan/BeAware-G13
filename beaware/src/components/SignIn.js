@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from '../css/Login.module.css';
 import logo from '../Assets/Group.png';
+import videoSource from '../Assets/welcome.mp4';
 import log from '../Assets/Vector.png'
 import { Link } from 'react-router-dom';
 import { initializeApp } from "firebase/app";
@@ -30,6 +31,10 @@ function Toast({ message }) {
 const SignIn = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [typedText, setTypedText] = useState('');
+    const textToType = "BeAware assists hearing-impaired individuals with secure sign-up and stream URL generation via user inputs, fostering accessibility goals.";
+    const [rotationAngle, setRotationAngle] = useState(0);
+    const [showVideo, setShowVideo] = useState(true);
     
     const [toastMessage, setToastMessage] = useState('');
     const showToast = (message) => {
@@ -38,6 +43,39 @@ const SignIn = () => {
         setToastMessage('');
       }, 3000); // Hide the toast after 3 seconds
     };
+
+    useEffect(() => {
+      let index = 0;
+      const typingInterval = setInterval(() => {
+        if (index < textToType.length) {
+          setTypedText((prevText) => prevText + textToType.charAt(index));
+          index++;
+        } else {
+          clearInterval(typingInterval);
+        }
+      }, 20); // Typing speed: 100 milliseconds per character
+  
+      return () => clearInterval(typingInterval);
+    }, []); 
+
+
+    useEffect(() => {
+      const rotationInterval = setInterval(() => {
+        setRotationAngle((prevAngle) => prevAngle + 1);
+      }, 50); // Rotation speed: 50 milliseconds
+  
+      return () => clearInterval(rotationInterval);
+    }, []); 
+
+    useEffect(() => {
+    // Show video after 5 seconds
+    const timer = setTimeout(() => {
+      setShowVideo(true);
+    }, 5000); 
+
+    return () => clearTimeout(timer);
+  }, []);
+
 
     const handleGoogleSignIn = async () => {
       
@@ -98,45 +136,56 @@ const SignIn = () => {
       
     }
     };
+    const handleVideoEnd = () => {
+      setShowVideo(false); // Update state to hide the video after it ends
+  };
+    
   
     return (
-      <div className={styles.container}>
-        <div className={styles.leftPanel}>
-        <div className={styles.logo}>
-          <img src={log} alt="Logo" />
+      <div className={styles.containerz}>
+        <div className={styles.leftPanelz}>
+        {showVideo ? (
+          <video className={`${styles.backgroundVideo}`} autoPlay muted onEnded={handleVideoEnd}>
+            <source src={videoSource} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        ) : (
+          <img src={log} alt="Logo" className={`${styles.logoz} ${styles.fadeOutImage}`} style={{ transform: `rotate(${rotationAngle}deg)` }} />
+        )}
+          <div className={styles.textz}>{typedText}</div>
         </div>
-        <div className={styles.text}>BeAware assists hearing-impaired individuals with secure sign-up and stream URL generation via user inputs, fostering accessibility goals.</div></div> {/* This div represents the left panel */}
-        <div className={styles.rightPanel}>
-        <div className={styles.formWrapper}>
-          <h1 className={styles.title}>Welcome Back!</h1>
-          <form onSubmit={handleSubmit} className={styles.form}>
-            <label htmlFor="email" className={styles.label}>
-            </label>
-            <input
-              type="email"
-              id="email"
-              placeholder="Email address"
-              onChange={(e) => setEmail(e.target.value)}
-              className={styles.input}
-            />
-            <label htmlFor="password" className={styles.label}>
-            </label>
-            <input
-              type="password"
-              id="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className={styles.input}
-            />
-            
-            <div className={styles.remember}>
-              <input type="checkbox" id="remember" />
-              <label htmlFor="remember">Remember me</label>
-            </div>
+        <div className={styles.rightPanelz}>
+          <div className={styles.formWrapperz}>
+            <h1 className={styles.titlez}>Welcome Back!</h1>
+            <form onSubmit={handleSubmit} className={styles.formz}>
+              <label htmlFor="email" className={styles.labelz}>
+              </label>
+              <input
+                type="email"
+                id="email"
+                placeholder="Email address"
+                onChange={(e) => setEmail(e.target.value)}
+                className={styles.inputz}
+              />
+              <label htmlFor="password" className={styles.labelz}>
+              </label>
+              <input
+                type="password"
+                id="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className={styles.inputz}
+              />
+              
+              <div className={styles.rememberz}>
+                <input type="checkbox" id="remember" />
+                <label htmlFor="remember">Remember me</label>
+              </div>
             <button type="submit" className={styles.button}>
               Log in
             </button>
+            <p></p>
             <button onClick={handleGoogleSignIn} className="google-sign-in-button">Sign In: Google</button>
           </form>
           <p className={styles.signup}>
