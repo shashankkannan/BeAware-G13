@@ -8,7 +8,7 @@ import streamicon from '../Assets/stream.png';
 import dash from '../Assets/dashboard.png'; 
 import eye from '../Assets/eye.png';
 import { initializeApp } from "firebase/app";
-import { getAuth, reauthenticateWithCredential, updatePassword } from 'firebase/auth';
+import { getAuth, reauthenticateWithCredential, updatePassword, sendPasswordResetEmail } from 'firebase/auth';
 import {getDatabase, ref, push, set, orderByChild, onChildAdded,equalTo, child, query, get, update } from 'firebase/database';
 const firebaseConfig = {
   apiKey: "AIzaSyBydzDcp1Qst5mZd9j7AjwiodwTq1oBbq0",
@@ -124,24 +124,25 @@ export const ManageProfile = () => {
 
   
   const handleChangePassword = () => {
-    if (newPassword !== confirmPassword) {
-      alert("New password and confirm password don't match.");
+    if (oldPassword !== email) {
+      alert("Your Email is incorrect.");
       return;
     }
 
-    const user = auth.currentUser;
-    updatePassword(user, newPassword)
-      .then(() => {
-        setOldPassword('');
-        setNewPassword('');
-        setConfirmPassword('');
-        showToast('Password updated successfully');
-      })
-      .catch((error) => {
-        console.error("Failed to update password:", error);
-        showToast(`Failed to update password: ${error.message}`);
-      });
-  };
+    sendPasswordResetEmail(auth, email)
+    .then(() => {
+      // Password reset email sent successfully
+      // console.log('Password reset email sent successfully');
+      // showToast("Password reset email sent successfully")
+      alert("Password reset email sent successfully")
+    })
+    .catch((error) => {
+      // An error occurred while sending the password reset email
+      console.error('Error sending password reset email:', error);
+    });
+}
+
+  
 
   return (
     <table style={{ width: "100%", height: "100%"}}>
@@ -237,77 +238,13 @@ export const ManageProfile = () => {
            <form id="passform" style={{ paddingLeft: "30px", paddingTop: "70px" }}>
 
                 <div className="form-field">
-                  <label htmlFor="oldpassword">Old Password</label>
+                  <label htmlFor="oldpassword">Email</label>
                   <div className="input-with-icon" style={{ display: "flex", alignItems: "center" }}>
-                    <input type="password" id="oldpassword" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} required="true" />
-                    <button style={{ border: 'none', background: 'transparent' }} onClick={(e) => 
-                    {
-                          e.preventDefault();
-                          const fieldId = 'oldpassword';
-                          const field = document.getElementById(fieldId);
-                          if (field) {
-                              if (field.type === 'password') {
-                                  field.type = 'text';
-                              } else {
-                                  field.type = 'password';
-                              }
-                          } else {
-                              console.error(`Element with ID "${fieldId}" not found.`);
-                          }
-                      }
-                      }>
-    <img style={{ width: "50px", height: "50px", transform: "scale(0.5)" }} src={eye} alt="Toggle password visibility" />
-</button>
+                    <input type="email" id="oldpassword" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} required="true" />
                   </div>
                 </div>
 
-                <div className="form-field">
-                  <label htmlFor="newpassword">New Password</label>
-                  <div className="input-with-icon" style={{ display: "flex", alignItems: "center" }}>
-                    <input type="password" id="newpassword" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required="true" />
-                    <button style={{ border: 'none', background: 'transparent' }} onClick={(e) => 
-                    {
-                          e.preventDefault();
-                          const fieldId = 'newpassword'; 
-                          const field = document.getElementById(fieldId);
-                          if (field) {
-                              if (field.type === 'password') {
-                                  field.type = 'text';
-                              } else {
-                                  field.type = 'password';
-                              }
-                          } else {
-                              console.error(`Element with ID "${fieldId}" not found.`);
-                          }
-                      }
-                      }> <img style={{ width: "50px", height: "50px", transform: "scale(0.5)" }} src={eye} alt="Toggle password visibility" /></button>
-                  </div>
-                </div>
-
-                <div className="form-field">
-                  <label htmlFor="confirmpassword">Confirm Password</label>
-                  <div className="input-with-icon" style={{ display: "flex", alignItems: "center" }}>
-                    <input type="password" id="confirmpassword" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required="true" />
-                    <button style={{ border: 'none', background: 'transparent' }} onClick={(e) => 
-                    {
-                          e.preventDefault();
-                          const fieldId = 'confirmpassword';
-                          const field = document.getElementById(fieldId);
-                          if (field) {
-                              if (field.type === 'password') {
-                                  field.type = 'text';
-                              } else {
-                                  field.type = 'password';
-                              }
-                          } else {
-                              console.error(`Element with ID "${fieldId}" not found.`);
-                          }
-                      }
-                      }>
-    <img style={{ width: "50px", height: "50px", transform: "scale(0.5)" }} src={eye} alt="Toggle password visibility" />
-</button>
-                  </div>
-                </div>
+                
 
                 <button style={{ 
       border: "2px solid grey", 
@@ -318,13 +255,13 @@ export const ManageProfile = () => {
       outline: "none",
       backgroundColor: "transparent",
       borderRadius: "20px"
-    }}  onClick={() => handleChangePassword(email,newPassword)
+    }}  onClick={() => handleChangePassword(email)
     
     
     
     }
     onMouseEnter={(e) => e.target.style.backgroundColor = "#457b9d"}
-    onMouseLeave={(e) => e.target.style.backgroundColor = "transparent"}>Change Password</button>
+    onMouseLeave={(e) => e.target.style.backgroundColor = "transparent"}>Password Reset</button>
             </form>
           
          {/* PASSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS FORMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM */}
