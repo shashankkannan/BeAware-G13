@@ -83,7 +83,21 @@
     height: auto;
     position: absolute;
     bottom: 20px;
-    left: 20px;
+    padding-right: 90px;
+    animation: moveImage 3s infinite;
+  }
+  @keyframes circularMotion {
+    0% {
+      transform: rotate(0deg); /* Initial rotation angle */
+    }
+    100% {
+      transform: rotate(360deg); /* Final rotation angle */
+    }
+  }
+  @keyframes moveImage {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(50px); }
+    100% { transform: translateX(0); }
   }
   
   
