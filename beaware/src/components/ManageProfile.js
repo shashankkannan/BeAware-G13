@@ -101,6 +101,7 @@ export const ManageProfile = () => {
           // Update the username in the state
           setUsername(newUsername);
           showToast('Username updated successfully');
+          sessionStorage.setItem('username', newUsername);
         } else {
           showToast('User not found');
         }
