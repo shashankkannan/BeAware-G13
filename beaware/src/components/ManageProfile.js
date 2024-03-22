@@ -125,21 +125,23 @@ export const ManageProfile = () => {
   
   const handleChangePassword = () => {
     if (oldPassword !== email) {
-      alert("Your Email is incorrect.");
-      return;
+      showToast("Your Email is incorrect.");
+    }
+    else{
+      sendPasswordResetEmail(auth, email)
+      .then(() => {
+        // Password reset email sent successfully
+        // console.log('Password reset email sent successfully');
+        // showToast("Password reset email sent successfully")
+        alert("Password reset email sent successfully")
+      })
+      .catch((error) => {
+        // An error occurred while sending the password reset email
+        console.error('Error sending password reset email:', error);
+      });
     }
 
-    sendPasswordResetEmail(auth, email)
-    .then(() => {
-      // Password reset email sent successfully
-      // console.log('Password reset email sent successfully');
-      // showToast("Password reset email sent successfully")
-      alert("Password reset email sent successfully")
-    })
-    .catch((error) => {
-      // An error occurred while sending the password reset email
-      console.error('Error sending password reset email:', error);
-    });
+    
 }
 
   
