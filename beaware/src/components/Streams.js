@@ -32,6 +32,7 @@ const firebaseConfig = {
   };
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
+
 export const Streams = () => {
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');

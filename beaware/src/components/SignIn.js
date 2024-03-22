@@ -119,10 +119,12 @@ const SignIn = () => {
         sessionStorage.clear();
         sessionStorage.setItem('username', fvn);
         sessionStorage.setItem('email', email);
+        sessionStorage.setItem('password',password);
         window.location.href = '/setup';
       }else {
         sessionStorage.setItem('username', fvn);
         sessionStorage.setItem('email', email);
+        sessionStorage.setItem('password',password);
         window.location.href = '/manage';
         // window.location = '/home';
       }
