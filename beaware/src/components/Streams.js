@@ -9,21 +9,9 @@ import dash from '../Assets/dashboard.png';
 import eye from '../Assets/eye.png'; 
 import { Link } from 'react-router-dom';
 import { initializeApp } from "firebase/app";
-import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, sendEmailVerification } from 'firebase/auth';
 import {getDatabase, ref, push, set, orderByChild, onChildAdded,equalTo, child, query, get } from 'firebase/database';
 
-const streamsData = [
-    { name: 'Stream 1', description: 'Description for Stream 1', image: 'image1.jpg' },
-    { name: 'Stream 2', description: 'Description for Stream 2', image: 'image2.jpg' },
-    { name: 'Stream 3', description: 'Description for Stream 3', image: 'image3.jpg' },
-    { name: 'Stream 4', description: 'Description for Stream 4', image: 'image4.jpg' },
-    { name: 'Stream 5', description: 'Description for Stream 5', image: 'image5.jpg' },
-    { name: 'Stream 1', description: 'Description for Stream 1', image: 'image1.jpg' },
-    { name: 'Stream 2', description: 'Description for Stream 2', image: 'image2.jpg' },
-    { name: 'Stream 3', description: 'Description for Stream 3', image: 'image3.jpg' },
-    { name: 'Stream 4', description: 'Description for Stream 4', image: 'image4.jpg' },
-    { name: 'Stream 5', description: 'Description for Stream 5', image: 'image5.jpg' }
-  ];
+
 
 function Toast({ message }) {
   return (
@@ -32,13 +20,7 @@ function Toast({ message }) {
     </div>
   );
 }
-
-export const Streams = () => {
-  const [email, setEmail] = useState('');
-  const [username, setUsername] = useState('');
-  const [toastMessage, setToastMessage] = useState('');
-
-  const firebaseConfig = {
+const firebaseConfig = {
     apiKey: "AIzaSyBydzDcp1Qst5mZd9j7AjwiodwTq1oBbq0",
     authDomain: "beawareg13-bdd89.firebaseapp.com",
     databaseURL: "https://beawareg13-bdd89-default-rtdb.firebaseio.com",
@@ -48,9 +30,18 @@ export const Streams = () => {
     appId: "1:634689069450:web:777dd650f473151ddb6873",
     measurementId: "G-ZBHNPLZDNC"
   };
-  const app = initializeApp(firebaseConfig);
-  const database = getDatabase(app);
-  const auth = getAuth(app);
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
+export const Streams = () => {
+  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
+  const [toastMessage, setToastMessage] = useState('');
+  const [streamsData, setStreamsData] = useState([]);
+  const [selectedStream, setSelectedStream] = useState(null);
+  const [isBlockVisible, setIsBlockVisible] = useState(false);  
+
+
+ 
 
   const showToast = (message) => {
     setToastMessage(message);
@@ -65,6 +56,7 @@ export const Streams = () => {
     if (storedUsername && storedEmail) {
       setUsername(storedUsername);
       setEmail(storedEmail);
+      fetchStreamsData(storedEmail)
     } else {
       showToast('User not signed in. Redirecting to sign-in page...');
       setTimeout(() => {
@@ -72,15 +64,48 @@ export const Streams = () => {
         window.location.href = '/signin'; 
       }, 3000);
     }
-    const passForm = document.getElementById('passform');
-    const delf = document.getElementById('deleteform');
-    if(delf) {
-      delf.style.display = 'none';
-    }
-    if (passForm) {
-      passForm.style.display = 'none';
-    }
+    
   }, []);
+
+  const fetchStreamsData = async (userEmail) => {
+    const streamsRef = ref(database, 'users');
+    
+    try {
+      const queryRef = query(streamsRef, orderByChild('email'), equalTo(userEmail));
+      const snapshot = await get(queryRef);
+
+      const userData = snapshot.val();
+      const streamsArray = [];
+
+      for (const userId in userData) {
+        const user = userData[userId];
+        if (user.streams) {
+          for (const streamName in user.streams) {
+            const stream = user.streams[streamName];
+            const streamData = {
+              name: streamName,
+              color: stream.colorhex,
+              logo: stream.logoURL
+            };
+            streamsArray.push(streamData);
+          }
+        }
+      }
+
+      setStreamsData(streamsArray);
+    } catch (error) {
+      console.error("Error fetching streams data:", error);
+    }
+  };
+
+  const handleStreamClick = (stream) => {
+    setSelectedStream(stream);
+    setIsBlockVisible(true);
+  };
+  const handleCloseBlock = () => {
+    setIsBlockVisible(false);
+    setSelectedStream(null);
+  };
 
   const handlestream = () => {
     window.location.href = '/streams';
@@ -134,27 +159,26 @@ export const Streams = () => {
 {/* Profileeeeeeeeeeeeeeeeeeeeeeeeeeeeee sectionnnnnnnnnnnnnn withhhhhhhhh theeeeeeeeeeeee avatarrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr */}
 
             
-            <div>
-              <table style={{ width: "100%", height: "100%" , paddingTop: "40px"}}>
-                <tr>
-                <h1></h1>
-                <td style={{ width: "30%", verticalAlign: "top", paddingLeft:"90px"}}>
-                  
-                  
-                <img src={userpic} style={{ width: "50px", height: "50px", transform: "scale(1.0)" }} alt="Edit userpic" />
-
-                </td>
-                <td style={{ width: "70%", verticalAlign: "top"}}>
-                  
-                  <tr>{username}</tr>
-                  <p></p>
-                  <tr>{email}</tr>
-                </td>
-                </tr>
-                
-              </table>
-
-            </div>
+<div style={{ marginLeft: "100px", width: "fit-content", borderRadius: "30px", boxShadow: "0px 5px 10px rgba(0, 0, 0, 0.1)" }}>
+  <table style={{ width: "100%", height: "100%", paddingTop: "40px" }}>
+    <tr>
+      <td style={{ width: "30%", verticalAlign: "top", paddingLeft: "40px", paddingBottom: "40px", paddingRight: "40px"}}>
+        <img src={userpic} style={{ width: "50px", height: "50px", transform: "scale(1.0)" }} alt="Edit userpic" />
+      </td>
+      <td style={{ width: "70%", verticalAlign: "top" , paddingRight: "40px"}}>
+        <tr>
+          <td style={{ fontWeight: "bold" }}>Name: </td>
+          <td>&nbsp;{username}</td>
+        </tr>
+        <div style={{ marginBottom: '10px'}}></div>
+        <tr>
+          <td style={{ fontWeight: "bold" }}>Email Id:</td>
+          <td>&nbsp;{email}</td>
+        </tr>
+      </td>
+    </tr>
+  </table>
+</div>
 
             <p></p>
 
@@ -164,17 +188,18 @@ export const Streams = () => {
            
             <div className = "scrollv" >
                     {streamsData.map((stream, index) => (
-                      <div key={index} className="stream-item" style={{ marginBottom: '20px' }} onClick={() => showToast(stream.name)}>
-                        <table style={{ width: '100%' }}>
+                      <div key={index} className="stream-item"  onClick={() => handleStreamClick(stream)}>
+                        <table style={{ width: '100%', border: "1px solid grey" }}>
                           <tr>
                             <td style={{ width: '50%' }}>
                               <div>
                                 <h3>{stream.name}</h3>
-                                <p>{stream.description}</p>
+                                <p>{stream.color}</p>
                               </div>
                             </td>
                             <td style={{ width: '50%' }}>
-                              <img src={stream.image} alt={stream.name} style={{ display: 'block', margin: 'auto' }} />
+                                
+                              <img src={stream.logo} alt={stream.logo} style={{ width: "50px", height: "50px", transform: "scale(1.0)" }} />
                             </td>
                           </tr>
                         </table>
@@ -184,13 +209,16 @@ export const Streams = () => {
            
           </td>
 
-          <td style={{ width: "20%", height: "100%", paddingRight:"10px", verticalAlign: "top"}}>
+          <td style={{ width: "20%", height: "100%", paddingRight:"40px", verticalAlign: "top"}}>
 
             {/* Right of Right */}
             
             
             
   <p></p>
+  <p></p>
+  <div style={{ marginBottom: '50px'}}></div>
+  <div style={{ marginRight: "30px"}}>
   <button 
     style={{ 
       border: "2px solid grey", 
@@ -205,7 +233,7 @@ export const Streams = () => {
     onClick={() => 
       {
       
-      console.log("Mange Streams clicked")
+      console.log("Manage Streams clicked")
       window.location.href = "/setup"
     }
    }
@@ -220,7 +248,10 @@ export const Streams = () => {
   >
     Manage Streams
   </button>
+</div>
   <p></p>
+  <div style={{ marginRight: "50px" }}></div>
+  <div style={{ marginRight: "30px" }}>
   <button 
     style={{ 
       border: "2px solid grey", 
@@ -234,8 +265,7 @@ export const Streams = () => {
     }} 
     onClick={() => 
       {
-      
-        console.log("Change password clicked")
+        console.log("Delete Account clicked")
         const profileForm = document.getElementById("profileform");
         const delForm = document.getElementById('deleteform');
         const passForm = document.getElementById('passform');
@@ -249,7 +279,7 @@ export const Streams = () => {
         }
         if (passForm) {
           passForm.style.display = 'none';
-      }
+        }
       }
 
     }
@@ -264,6 +294,37 @@ export const Streams = () => {
   >
     Delete Account
   </button>
+  </div>
+  <div style={{ display: "flex", justifyContent:"center", alignItems: "center", marginTop: '90px',  border: '1px solid #ccc', padding: '10px', borderRadius: '5px', display: selectedStream ? 'block' : 'none' }}>
+  {selectedStream && (
+    <>
+      <h3>{selectedStream.name}</h3>
+      
+      <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(selectedStream.logo)}`} alt={selectedStream.name} style={{ width: '100px', height: '100px' }} />
+      
+      <p>{selectedStream.color}</p>
+      <p></p>
+      <button style={{ 
+      border: "2px solid grey", 
+      width: "100%", 
+      padding: "10px", 
+      cursor: "pointer", 
+      outline: "none",
+      backgroundColor: "transparent",
+      borderRadius: "20px",
+      transition: "transform 0.3s ease"
+    }}  onClick={handleCloseBlock}  onMouseEnter={(e) => {
+        e.target.style.backgroundColor = "#457b9d";
+        e.target.style.transform = "scale(1.01)"; // Increase scale
+      }}
+      onMouseLeave={(e) => {
+        e.target.style.backgroundColor = "transparent";
+        e.target.style.transform = "scale(1)"; // Restore original scale
+      }}>Close</button>
+    </>
+  )}
+</div>
+  
   
 </td>
         </tr>
